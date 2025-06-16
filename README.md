@@ -12,7 +12,7 @@
 ### Korean version
 ![image](https://github.com/user-attachments/assets/0380e1da-3cb8-48d3-9f23-6cf59258edaf)
 
-### before revise
+### - before revise
 ![image](https://github.com/user-attachments/assets/a76102b7-329e-46bc-a73f-185b72582118)
 
 
