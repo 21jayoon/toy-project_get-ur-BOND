@@ -5,9 +5,14 @@
 
 ## 🧱 Data modeling (ERD)
 ### English version
+
+### before revise
 ![image](https://github.com/user-attachments/assets/5c336d5a-3da3-49dc-833f-b847f6010379)
 
 ### Korean version
+![image.png](attachment:6aa231ce-9341-493c-9eae-65f0ca89f839:image.png)
+
+### before revise
 ![image](https://github.com/user-attachments/assets/a76102b7-329e-46bc-a73f-185b72582118)
 
 
