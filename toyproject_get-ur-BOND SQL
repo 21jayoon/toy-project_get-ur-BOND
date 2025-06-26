@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS tbl_user CASCADE;
 DROP TABLE IF EXISTS tbl_like CASCADE;
 DROP TABLE IF EXISTS tbl_bonds CASCADE;
 DROP TABLE IF EXISTS tbl_bondtype CASCADE;
-DROP TABLE IF EXISTS tbl_baseRate CASCADE;
+DROP TABLE IF EXISTS tbl_cpi CASCADE;
 
 
 /* 2. Generate the tables */
@@ -57,11 +57,3 @@ type_name   VARCHAR(15) NOT NULL COMMENT '종류이름',
 CONSTRAINT pk_type_code PRIMARY KEY (type_code)
 ) ENGINE=INNODB COMMENT '채권종류테이블';
 
-CREATE TABLE IF NOT EXISTS tbl_bondtype_explain
-(
-`TYPE_CODE`    INT NOT NULL COMMENT '종류코드',
-`type_message`    VARCHAR(255) NOT NULL COMMENT '설명메세지',
-PRIMARY KEY ( `TYPE_CODE` ),
-CONSTRAINT fk_TYPE_CODE FOREIGN KEY (TYPE_CODE) REFERENCES tbl_bondtype (type_code)
-)
-COMMENT = '채권타입설명';
