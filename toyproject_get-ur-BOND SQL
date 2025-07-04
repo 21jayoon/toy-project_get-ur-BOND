@@ -19,16 +19,17 @@
 # 기준금리 테이블 : 금리결정일(PK), 기관명, 기준금리
 
 # 2. DB Script
-CREATE DATABASE geturBONDdb;
-GRANT ALL PRIVILEGES ON geturBONDdb.* TO 'ohgiraffers'@'%';
-USE geturBONDdb;
+-- CREATE DATABASE geturBONDdb;
+-- GRANT ALL PRIVILEGES ON geturBONDdb.* TO 'ohgiraffers'@'%';
+-- USE geturBONDdb;
 
 /*  1. Delete tables */
+-- user, bondtype, bonds, bondtype_explain, like, base_rate
 DROP TABLE IF EXISTS tbl_user CASCADE;
-DROP TABLE IF EXISTS tbl_like CASCADE;
-DROP TABLE IF EXISTS tbl_bonds CASCADE;
 DROP TABLE IF EXISTS tbl_bondtype CASCADE;
-DROP TABLE IF EXISTS tbl_cpi CASCADE;
+DROP TABLE IF EXISTS tbl_bonds CASCADE;
+DROP TABLE IF EXISTS tbl_like CASCADE;
+DROP TABLE IF EXISTS tbl_base_rate CASCADE;
 
 
 /* 2. Generate the tables */
@@ -38,17 +39,7 @@ user_id INT AUTO_INCREMENT COMMENT '유저고유번호',
 user_nickname VARCHAR(30) NOT NULL COMMENT '유저닉네임',
 CONSTRAINT pk_user_id PRIMARY KEY (user_id)
 ) ENGINE=INNODB COMMENT '유저테이블';
-
-CREATE TABLE IF NOT EXISTS tbl_bonds
-(
-bond_code   INT AUTO_INCREMENT COMMENT '채권코드',
-bond_name   VARCHAR(50) NOT NULL COMMENT '채권이름',
-bond_type   INT NOT NULL COMMENT '채권종류',
-bond_yield  DOUBLE NOT NULL COMMENT '채권 금리',
-bond_duration  DATE NOT NULL COMMENT '만기일',
-CONSTRAINT pk_bond_code PRIMARY KEY (bond_code),
-CONSTRAINT fk_bond_type FOREIGN KEY (bond_type) REFERENCES tbl_bondtype (type_code)
-) ENGINE=INNODB COMMENT '채권테이블';
+-- PRIMARY KEY 제약조건을 설정하면 자동으로 NOT NULL제약 조건이 적용된다
 
 CREATE TABLE IF NOT EXISTS tbl_bondtype
 (
@@ -57,3 +48,77 @@ type_name   VARCHAR(15) NOT NULL COMMENT '종류이름',
 CONSTRAINT pk_type_code PRIMARY KEY (type_code)
 ) ENGINE=INNODB COMMENT '채권종류테이블';
 
+CREATE TABLE IF NOT EXISTS tbl_bonds
+(
+bond_code   INT AUTO_INCREMENT COMMENT '채권코드',
+bond_name   VARCHAR(50) NOT NULL COMMENT '채권이름',
+bond_type   INT(5) NOT NULL COMMENT '채권종류',
+bond_yield  DOUBLE NOT NULL COMMENT '채권 금리',
+bond_duration  DATE NOT NULL COMMENT '만기일',
+CONSTRAINT pk_bond_code PRIMARY KEY (bond_code),
+CONSTRAINT fk_bond_type FOREIGN KEY (bond_type) REFERENCES tbl_bondtype (type_code)
+) ENGINE=INNODB COMMENT '채권테이블';
+
+CREATE TABLE IF NOT EXISTS tbl_like
+(
+USER_ID    INT NOT NULL COMMENT '유저고유번호',
+BOND_CODE    INT NOT NULL COMMENT '채권코드',
+-- PRIMARY KEY ( USER_ID, BOND_CODE ),
+-- user가 마음에 드는 채권이 없을 수도 있음.(스크랩이 필수가 아님. 1:M Mandatory->1:M optional)
+-- PK 복합키 해제 (참조 : https://gwamssoju.tistory.com/109)
+CONSTRAINT fk_USER_ID FOREIGN KEY ( USER_ID ) REFERENCES tbl_user (user_id),
+CONSTRAINT fk_BOND_CODE FOREIGN KEY ( BOND_CODE ) REFERENCES tbl_bonds (bond_code)
+)
+COMMENT = '스크랩테이블';
+
+CREATE TABLE IF NOT EXISTS tbl_cpi
+(
+rate_id   VARCHAR(10) COMMENT '금리결정일',
+cpi   DOUBLE NOT NULL COMMENT '소비자물가지수',
+CONSTRAINT pk_rate_id PRIMARY KEY (rate_id)
+) ENGINE=INNODB COMMENT 'CPI테이블';
+
+
+/* 3. INSERT DATA */
+INSERT INTO tbl_user (user_id, user_nickname) VALUES
+(null,'빨간 사슴'),
+(null,'주황 코알라'),
+(null,'노란 사마귀'),
+(null,'초록 얼룩말'),
+(null,'파란 고양이'),
+(null,'남색 판다'),
+(null,'보라 토끼');
+
+INSERT INTO tbl_bondtype (type_code, type_name) VALUES
+(null, '국채'),
+(null, '회사채');
+
+INSERT INTO tbl_bonds (bond_code, bond_name, bond_type, bond_yield, bond_duration) VALUES
+(null, '서울은행 차016-01', 2, 3.4, '2026-04-01'),
+(null, '을지로건설 221-02', 2, 4.2, '2025-12-12'),
+(null, '과거자산증권 117-03', 2, 3.5, '2025-07-08'),
+(null, '경기카드 389', 2, 3.6, '2025-06-12'),
+(null, '국고02400-2710', 1, 2.4, '2027-10-17'),
+(null, '국고02800-3511', 1, 2.8, '2035-11-19');
+
+INSERT INTO tbl_like (USER_ID, BOND_CODE) VALUES
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 5),
+(2, 6),
+(3, 1),
+(3, 6),
+(4, 6),
+(5, 1),
+(5, 3),
+(6, 2),
+(6, 5),
+(7, 3),
+(7, 4),
+(7, 5);
+
+INSERT INTO tbl_cpi (rate_id, cpi) VALUES
+('202506', 2.2); 
+
+COMMIT;
